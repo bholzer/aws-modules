@@ -24,7 +24,7 @@ locals {
         private = [ for cidr, zone in local.private_subnets: cidr if az == zone ]
       }
   }
-  public_nat_subnets = [ for az, obj in local.subnets_by_az: obj.public[0] ]
+  public_nat_subnets = [ for az, obj in local.subnets_by_az: obj.public[0] if length(obj.public) > 0 ]
 }
 
 resource "aws_vpc" "this" {
@@ -69,7 +69,7 @@ resource "aws_route_table_association" "public" {
 
 # Private route tables, per-AZ
 resource "aws_route_table" "private" {
-  for_each = toset(local.availability_zones)
+  for_each = toset([ for az, obj in local.subnets_by_az: az if length(obj.private) > 0 ])
 
   vpc_id = aws_vpc.this.id
   tags = var.tags
@@ -118,10 +118,10 @@ resource "aws_route" "nat" {
 
   route_table_id = each.value.id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id = [
+  nat_gateway_id = flatten([
     for az, obj in local.subnets_by_az: [
       for cidr, nat in aws_nat_gateway.this:
         nat.id if contains(obj.public, cidr)
-    ][0] if az == each.key
-  ][0]
+    ] if az == each.key
+  ])[0]
 }
