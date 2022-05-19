@@ -1,8 +1,7 @@
 /**
  *  # SQS Queue
  *
- *  This module creates an SQS queue.
- *  TODO: deadletter queue
+ *  This module creates an SQS queue with an optional dead-letter queue
  */
 
 terraform {
@@ -25,6 +24,27 @@ resource "aws_sqs_queue" "this" {
   max_message_size = var.max_message_size
   delay_seconds = var.delay_seconds
   receive_wait_time_seconds = var.receive_wait_time_seconds
+  fifo_queue = var.fifo
+  fifo_throughput_limit = var.fifo_throughput_limit
+  content_based_deduplication = var.content_based_deduplication
+  deduplication_scope = var.deduplication_scope
+
+  redrive_policy = var.dlq_enable ? jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.dlq[0].arn
+    maxReceiveCount = var.dlq_max_receive_count
+  }) : null
+
+  tags = var.tags
+}
+
+resource "aws_sqs_queue" "dlq" {
+  count = var.dlq_enable ? 1 : 0
+  name = "${var.name}-dlq"
+  visibility_timeout_seconds = var.dlq_visibility_timeout_seconds
+  message_retention_seconds = var.dlq_message_retention_seconds
+  max_message_size = var.max_message_size
+  delay_seconds = var.dlq_delay_seconds
+  receive_wait_time_seconds = var.dlq_receive_wait_time_seconds
   fifo_queue = var.fifo
   fifo_throughput_limit = var.fifo_throughput_limit
   content_based_deduplication = var.content_based_deduplication

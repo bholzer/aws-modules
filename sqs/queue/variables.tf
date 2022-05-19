@@ -57,6 +57,42 @@ variable "deduplication_scope" {
   default = null
 }
 
+variable "dlq_enable" {
+  type = bool
+  description = "Enable dead-letter queue"
+  default = true
+}
+
+variable "dlq_max_receive_count" {
+  type = number
+  description = "Maximum number of DLQ tries"
+  default = 5
+}
+
+variable "dlq_delay_seconds" {
+  type = number
+  description = "Number of seconds to delay messages for DLQ"
+  default = null
+}
+
+variable "dlq_message_retention_seconds" {
+  type = number
+  description = "Number of seconds to retain dlq messages"
+  default = null
+}
+
+variable "dlq_receive_wait_time_seconds" {
+  type = number
+  description = "Number of seconds to wait for DLQ messages"
+  default = null
+}
+
+variable "dlq_visibility_timeout_seconds" {
+  type = number
+  description = "DLQ visibility timeout"
+  default = null
+}
+
 variable "tags" {
   type = map(string)
   default = {}
