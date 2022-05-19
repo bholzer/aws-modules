@@ -1,3 +1,10 @@
+/**
+ *  # SQS Queue
+ *
+ *  This module creates an SQS queue.
+ *  TODO: deadletter queue
+ */
+
 terraform {
   required_version = ">= 1.1.9"
 

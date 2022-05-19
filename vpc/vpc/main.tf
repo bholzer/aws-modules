@@ -1,3 +1,11 @@
+/**
+ *  # VPC
+ *
+ *  This module creates a VPC with specified CIDR and subnets.
+ *  An internet gateway and routing may optionally be created, with a NAT gateway also being optional.
+ *  If NAT gateway is enabled, one is created in each AZ where a public subnet exists.
+ */
+
 terraform {
   required_version = ">= 1.1.9"
 

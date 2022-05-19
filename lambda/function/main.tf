@@ -1,3 +1,9 @@
+/**
+ *  # Lambda function
+ *
+ *  This module creates a lambda function, log group, and necessary IAM resources.
+ */
+
 terraform {
   required_version = ">= 1.1.9"
 

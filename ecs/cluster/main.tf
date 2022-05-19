@@ -1,3 +1,9 @@
+/**
+ *  # ECS Cluster
+ *
+ *  Creates an ECS cluster with the provided capacity providers.
+ */
+
 terraform {
   required_version = ">= 1.1.9"
 

@@ -10,14 +10,7 @@ terraform {
 }
 
 locals {
-  lambda_routes = {
-    for key, route in var.routes:
-      key => merge(
-        { payload_format_version = "2.0" },
-        route,
-        { has_jwt = length(try(route.jwt, {})) > 0 }
-      ) if route.type == "lambda"
-  }
+  lambda_routes = { for key, route in var.routes: key => route if route.type == "lambda" }
 
   s3_routes = {
     for key, route in var.routes:
@@ -30,12 +23,12 @@ locals {
         route,
         {
           request_parameters = merge(
-            { body = "$request.body" },
-            try(route.request_parameters, {})
+            { MessageBody = "$request.body.message" },
+            try(route.request_parameters, {}),
+            { QueueUrl = route.queue_url }
           )
-          has_jwt = length(try(route.jwt, {})) > 0
         }
-      )
+      ) if route.type == "sqs"
   }
 }
 
@@ -54,16 +47,65 @@ resource "aws_apigatewayv2_stage" "default" {
   tags = var.tags
 }
 
-resource "aws_apigatewayv2_authorizer" "jwt" {
-  for_each = {  }
-}
-
 resource "aws_apigatewayv2_route" "lambda" {
   for_each = local.lambda_routes
 
   api_id = aws_apigatewayv2_api.this.id
   route_key = each.key
+  target = "integrations/${aws_apigatewayv2_integration.lambda[each.key].id}"
+}
 
-  authorization_type = each.value.has_jwt ? "JWT" : null
-  authorization_scopes = each.value.has_jwt ? try(each.value.jwt.authorization_scopes, null) : null
+resource "aws_apigatewayv2_integration" "lambda" {
+  for_each = local.lambda_routes
+
+  api_id = aws_apigatewayv2_api.this.id
+  integration_type = "AWS_PROXY"
+  integration_method = "POST"
+  integration_uri = each.value.invoke_arn
+  payload_format_version = try(each.value.payload_format_version, null)
+}
+
+resource "aws_lambda_permission" "gateway" {
+  for_each = toset([ for k, route in local.lambda_routes: route.function_name ])
+
+  action = "lambda:InvokeFunction"
+  function_name = each.value
+  principal = "apigateway.amazonaws.com"
+  source_arn = join("/", [aws_apigatewayv2_api.this.execution_arn, "*", "*"])
+}
+
+resource "aws_apigatewayv2_route" "s3" {
+  for_each = local.s3_routes
+
+  api_id = aws_apigatewayv2_api.this.id
+  route_key = each.key
+  target = "integrations/${aws_apigatewayv2_integration.s3[each.key].id}"
+}
+
+resource "aws_apigatewayv2_integration" "s3" {
+  for_each = local.s3_routes
+
+  api_id = aws_apigatewayv2_api.this.id
+  integration_type = "HTTP_PROXY"
+  integration_method = "GET"
+  integration_uri = "${each.value.bucket_url}/{proxy}"
+}
+
+resource "aws_apigatewayv2_route" "sqs" {
+  for_each = local.sqs_routes
+
+  api_id = aws_apigatewayv2_api.this.id
+  route_key = each.key
+  target = "integrations/${aws_apigatewayv2_integration.sqs[each.key].id}"
+}
+
+resource "aws_apigatewayv2_integration" "sqs" {
+  for_each = local.sqs_routes
+
+  api_id = aws_apigatewayv2_api.this.id
+  integration_type = "AWS_PROXY"
+  integration_subtype = "SQS-SendMessage"
+  integration_method = "POST"
+  integration_uri = each.value.arn
+  request_parameters = each.value.request_parameters
 }

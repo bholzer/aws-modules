@@ -1,3 +1,10 @@
+/**
+ *  # ECS Task Definition
+ *
+ *  Creates an ECS task definition with provided container definitions.
+ *  Also created are a log group, SSM parameters and necessary IAM resources.
+ */
+
 terraform {
   required_version = ">= 1.1.9"
 
