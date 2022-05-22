@@ -16,6 +16,8 @@ terraform {
       source = "hashicorp/archive"
     }
   }
+
+  backend "s3" {}
 }
 
 locals {

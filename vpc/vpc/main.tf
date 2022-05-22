@@ -15,6 +15,8 @@ terraform {
       version = ">= 4.12.1"
     }
   }
+
+  backend "s3" {}
 }
 
 data "aws_availability_zones" "azs" {

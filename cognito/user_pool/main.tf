@@ -4,6 +4,19 @@
  *  Creates a Cognito user pool, client, and domain
  */
 
+terraform {
+  required_version = ">= 1.1.9"
+
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = ">= 4.12.1"
+    }
+  }
+
+  backend "s3" {}
+}
+
 resource "aws_cognito_user_pool" "this" {
   name = var.name
 }
