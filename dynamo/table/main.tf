@@ -38,9 +38,13 @@ resource "aws_dynamodb_table" "this" {
     }
   }
 
-  ttl {
-    enabled = var.ttl_enabled
-    attribute_name = var.ttl_attribute_name
+  dynamic "ttl" {
+    for_each = var.ttl_enabled ? [1] : []
+
+    content {
+      enabled = var.ttl_enabled
+      attribute_name = var.ttl_attribute_name
+    }
   }
 
   dynamic "local_secondary_index" {
