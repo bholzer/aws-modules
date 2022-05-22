@@ -78,7 +78,7 @@ variable "attributes" {
 
 variable "ttl_enabled" {
   type = bool
-  desciption = "Enables TTL"
+  description = "Enables TTL"
   default = false
 }
 
