@@ -32,3 +32,8 @@ variable "supported_identity_providers" {
   description = "List of provider names for the identity providers that are supported on this client"
   default = null
 }
+
+variable "tags" {
+  type = map(string)
+  default = {}
+}
