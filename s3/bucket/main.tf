@@ -45,7 +45,7 @@ resource "aws_s3_bucket_logging" "this" {
   for_each = toset(var.log_bucket_name == null ? [] : [var.log_bucket_name])
   bucket = aws_s3_bucket.this.id
   target_bucket = var.log_bucket_name
-  target_prefix = "log/${aws_s3_bucket.this.name}"
+  target_prefix = "log/${aws_s3_bucket.this.id}"
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
@@ -69,7 +69,7 @@ resource "aws_s3_bucket_versioning" "this" {
 
 resource "aws_s3_bucket_public_access_block" "this" {
   count = var.block_access ? 1 : 0
-  bucket = aws_s3_bucket.bucket.id
+  bucket = aws_s3_bucket.this.id
   block_public_acls = true
   block_public_policy = true
   ignore_public_acls = true
@@ -79,7 +79,10 @@ resource "aws_s3_bucket_public_access_block" "this" {
 data "aws_iam_policy_document" "public" {
   statement {
     actions = ["s3:GetObject"]
-    principals = ["*"]
+    principals {
+      type = "*"
+      identifiers = ["*"]
+    }
     resources = ["${aws_s3_bucket.this.arn}/*"]
   }
 }
