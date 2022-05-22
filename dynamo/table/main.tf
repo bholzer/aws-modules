@@ -108,7 +108,7 @@ data "aws_iam_policy_document" "table_read" {
       "dynamodb:ConditionCheckItem",
       "dynamodb:GetRecords"
     ]
-    Resource = [
+    resources = [
       aws_dynamodb_table.this.arn,
       "${aws_dynamodb_table.this.arn}/index/*",
       "${aws_dynamodb_table.this.arn}/stream/*"
@@ -127,7 +127,7 @@ data "aws_iam_policy_document" "table_write" {
       "dynamodb:PartiQLInsert",
       "dynamodb:PartiQLUpdate"
     ]
-    Resource = [ aws_dynamodb_table.this.arn ]
+    resources = [ aws_dynamodb_table.this.arn ]
   }
 }
 
