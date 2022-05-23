@@ -139,7 +139,7 @@ resource "aws_apigatewayv2_integration" "sqs" {
 resource "aws_apigatewayv2_authorizer" "this" {
   for_each = { for key, route in merge(local.lambda_routes, local.sqs_routes): key => route if route.auth_enabled }
 
-  name = replace(each.key, "/^[a-zA-Z0-9._-]+/", "-") 
+  name = replace(each.key, "/[^a-zA-Z0-9._-]+/", "-") 
   api_id = aws_apigatewayv2_api.this.id
   authorizer_type = "JWT"
   identity_sources = [ each.value.auth.source ]
