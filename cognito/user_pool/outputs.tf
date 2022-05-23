@@ -4,6 +4,7 @@ output "user_pool" {
 
 output "client" {
   value = aws_cognito_user_pool_client.this
+  sensitive = true
 }
 
 output "domain" {
