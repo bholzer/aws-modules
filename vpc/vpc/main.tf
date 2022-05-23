@@ -41,7 +41,9 @@ resource "aws_vpc" "this" {
   cidr_block = var.cidr_block
   enable_dns_support = var.enable_dns_support
   enable_dns_hostnames = var.enable_dns_hostnames
-  tags = var.tags
+  tags = merge(var.tags, { 
+    Name = var.name
+  })
 }
 
 resource "aws_subnet" "public" {
@@ -51,7 +53,9 @@ resource "aws_subnet" "public" {
   availability_zone = each.value
   cidr_block = each.key
   map_public_ip_on_launch = true
-  tags = var.tags
+  tags = merge(var.tags, { 
+    Name = "${var.name}-public"
+  })
 }
 
 resource "aws_subnet" "private" {
@@ -61,13 +65,17 @@ resource "aws_subnet" "private" {
   availability_zone = each.value
   cidr_block = each.key
   map_public_ip_on_launch = false
-  tags = var.tags
+  tags = merge(var.tags, { 
+    Name = "${var.name}-private"
+  })
 }
 
 # Public route table
 resource "aws_default_route_table" "public" {
   default_route_table_id = aws_vpc.this.default_route_table_id
-  tags = var.tags
+  tags = merge(var.tags, { 
+    Name = "${var.name}-public-rt"
+  })
 }
 
 resource "aws_route_table_association" "public" {
@@ -82,7 +90,9 @@ resource "aws_route_table" "private" {
   for_each = toset([ for az, obj in local.subnets_by_az: az if length(obj.private) > 0 ])
 
   vpc_id = aws_vpc.this.id
-  tags = var.tags
+  tags = merge(var.tags, { 
+    Name = "${var.name}-private-rt"
+  })
 }
 
 resource "aws_route_table_association" "private" {
@@ -97,7 +107,9 @@ resource "aws_internet_gateway" "this" {
   count = var.create_internet_gateway ? 1 : 0
 
   vpc_id = aws_vpc.this.id
-  tags = var.tags
+  tags = merge(var.tags, { 
+    Name = var.name
+  })
 }
 
 resource "aws_route" "internet" {
@@ -112,7 +124,9 @@ resource "aws_eip" "nat" {
   for_each = var.create_nat ? toset(local.public_nat_subnets) : []
 
   vpc = true
-  tags = var.tags
+  tags = merge(var.tags, { 
+    Name = var.name
+  })
 }
 
 resource "aws_nat_gateway" "this" {
@@ -120,7 +134,9 @@ resource "aws_nat_gateway" "this" {
 
   allocation_id = aws_eip.nat[each.value].id
   subnet_id = aws_subnet.public[each.value].id
-  tags = var.tags
+  tags = merge(var.tags, { 
+    Name = var.name
+  })
 }
 
 resource "aws_route" "nat" {
