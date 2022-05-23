@@ -136,8 +136,12 @@ resource "aws_lambda_function" "this" {
   memory_size = var.memory_size
   timeout = var.timeout
 
-  environment {
-    variables = var.environment
+  dynamic "environment" {
+    for_each = length(var.environment) > 0 ? [1] : []
+
+    content {
+      variables = var.environment
+    }
   }
 
   dynamic "vpc_config" {
