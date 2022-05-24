@@ -1,7 +1,7 @@
 variable "access_token_validity" {
-  type = string
+  type = number
   description = "Time limit, between 5 minutes and 1 day, after which the access token is no longer valid and cannot be used."
-  default = "240 minutes"
+  default = 240
 }
 
 variable "allowed_oauth_flows" {
@@ -57,9 +57,9 @@ variable "generate_secret" {
 }
 
 variable "id_token_validity" {
-  type = string
+  type = number
   description = "Time limit, between 5 minutes and 1 day, after which the ID token is no longer valid and cannot be used."
-  default = "240 minutes"
+  default = 240
 }
 
 variable "logout_urls" {
