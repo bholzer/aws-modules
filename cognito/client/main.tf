@@ -22,7 +22,7 @@ resource "aws_cognito_user_pool_client" "this" {
 
   user_pool_id = var.user_pool_id
   access_token_validity = var.access_token_validity
-  allowed_oauth_flows_user_pool_client = var.allowed_oauth_flows_user_pool_client
+  allowed_oauth_flows_user_pool_client = var.oauth_flows_enabled
   allowed_oauth_flows = var.allowed_oauth_flows
   allowed_oauth_scopes = var.allowed_oauth_scopes
   callback_urls = var.callback_urls

@@ -1,31 +1,31 @@
 variable "access_token_validity" {
   type = number
-  description = "Time limit, between 5 minutes and 1 day, after which the access token is no longer valid and cannot be used."
-  default = 240
+  description = "Time limit in hours, between 5 minutes and 1 day, after which the access token is no longer valid and cannot be used."
+  default = 4
 }
 
 variable "allowed_oauth_flows" {
   type = list(string)
   description = "List of allowed oauth flows. Valid values are `code`, `implicit` and `client_credentials`."
-  default = []
+  default = null
 }
 
-variable "allowed_oauth_flows_user_pool_client" {
+variable "oauth_flows_enabled" {
   type = bool
   description = "Whether the client is allowed to follow the OAuth protocol when interacting with Cognito user pools."
-  default = true
+  default = false
 }
 
 variable "allowed_oauth_scopes" {
   type = list(string)
   description = "List of allowed OAuth scopes. Valid values are `phone`, `email`, `openid`, `profile` and `aws.cognito.signin.user.admin`."
-  default = ["openid", "email"]
+  default = null
 }
 
 variable "callback_urls" {
   type = list(string)
   description = "List of allowed callback URLs for the identity providers."
-  default = []
+  default = null
 }
 
 variable "default_redirect_uri" {
@@ -58,8 +58,8 @@ variable "generate_secret" {
 
 variable "id_token_validity" {
   type = number
-  description = "Time limit, between 5 minutes and 1 day, after which the ID token is no longer valid and cannot be used."
-  default = 240
+  description = "Time limit in hours, between 5 minutes and 1 day, after which the ID token is no longer valid and cannot be used."
+  default = 4
 }
 
 variable "logout_urls" {
