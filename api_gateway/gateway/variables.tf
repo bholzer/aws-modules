@@ -15,6 +15,18 @@ variable "auto_deploy" {
   default = true
 }
 
+variable "default_throttling_burst_limit" {
+  type = number
+  description = "Default throttling burst limit for routes"
+  default = 50
+}
+
+variable "default_throttling_rate_limit" {
+  type = number
+  description = "Default throttling rate limit for routes"
+  default = 100
+}
+
 variable "routes" {
   type = any
   description = "Object mapping routes to integration configurations"

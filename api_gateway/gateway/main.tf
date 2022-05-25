@@ -60,6 +60,11 @@ resource "aws_apigatewayv2_stage" "default" {
   name = "$default"
   auto_deploy = var.auto_deploy
   tags = var.tags
+
+  default_route_settings {
+    throttling_burst_limit = var.default_throttling_burst_limit
+    throttling_rate_limit = var.default_throttling_rate_limit
+  }
 }
 
 data "aws_lambda_function" "lambda" {
