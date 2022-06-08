@@ -32,6 +32,16 @@ variable "routes" {
   description = "Object mapping routes to integration configurations"
 }
 
+variable "authorizers" {
+  type = map(object({
+    source = string
+    audience = list(string)
+    issuer = string
+  }))
+  description = "A map of named authorizers, which can be added to routes"
+  default = {}
+}
+
 variable "tags" {
   type = map(string)
   default = {}

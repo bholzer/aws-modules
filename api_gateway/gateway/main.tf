@@ -2,6 +2,7 @@
  *  # API Gateway
  *
  *  Creates an API Gateway with routes and their integrations
+ *  Currently supports JWT authorizers only
  */
 
 terraform {
@@ -78,7 +79,7 @@ resource "aws_apigatewayv2_route" "lambda" {
   api_id = aws_apigatewayv2_api.this.id
   route_key = each.key
   target = "integrations/${aws_apigatewayv2_integration.lambda[each.key].id}"
-  authorizer_id = each.value.auth_enabled ? aws_apigatewayv2_authorizer.this[each.key].id : null
+  authorizer_id = each.value.auth_enabled ? aws_apigatewayv2_authorizer.this[each.value.auth.authorizer_name].id : null
   authorization_type = each.value.auth_enabled ? "JWT" : null
   authorization_scopes = each.value.auth_enabled ? try(each.value.auth.scopes, null) : null
 }
@@ -125,7 +126,7 @@ resource "aws_apigatewayv2_route" "sqs" {
   api_id = aws_apigatewayv2_api.this.id
   route_key = each.key
   target = "integrations/${aws_apigatewayv2_integration.sqs[each.key].id}"
-  authorizer_id = each.value.auth_enabled ? aws_apigatewayv2_authorizer.this[each.key].id : null
+  authorizer_id = each.value.auth_enabled ? aws_apigatewayv2_authorizer.this[each.value.auth.authorizer_name].id : null
   authorization_type = each.value.auth_enabled ? "JWT" : null
   authorization_scopes = each.value.auth_enabled ? try(each.value.auth.scopes, null) : null
 }
@@ -142,17 +143,15 @@ resource "aws_apigatewayv2_integration" "sqs" {
 }
 
 resource "aws_apigatewayv2_authorizer" "this" {
-  for_each = { for key, route in merge(local.lambda_routes, local.sqs_routes): key => route if route.auth_enabled }
+  for_each = var.authorizers
 
-  name = replace(each.key, "/[^a-zA-Z0-9._-]+/", "-") 
+  name = "${var.name}-${each.key}"
   api_id = aws_apigatewayv2_api.this.id
   authorizer_type = "JWT"
-  identity_sources = [ each.value.auth.source ]
+  identity_sources = [ each.value.source ]
 
   jwt_configuration {
-    audience = each.value.auth.audience
-    issuer = each.value.auth.issuer
+    audience = each.value.audience
+    issuer = each.value.issuer
   }
 }
-
-
