@@ -132,9 +132,9 @@ resource "aws_lambda_function" "this" {
   description = var.description
   runtime = var.runtime
   filename = var.s3_source == null ? data.archive_file.stub.output_path : null
-  s3_bucket = var.s3_source != null ? var.s3_source.bucket
-  s3_key = var.s3_source != null ? var.s3_source.key
-  s3_object_version = var.s3_source != null ? var.s3_source.version
+  s3_bucket = var.s3_source != null ? var.s3_source.bucket : null
+  s3_key = var.s3_source != null ? var.s3_source.key : null
+  s3_object_version = var.s3_source != null ? var.s3_source.version : null
   handler = var.handler
   memory_size = var.memory_size
   timeout = var.timeout
