@@ -50,6 +50,16 @@ variable "log_retention" {
   default = null
 }
 
+variable "s3_source" {
+  type = object({
+    bucket = string
+    key = string
+    version = optional(number)
+  })
+  description = "Specify the code for the function to be from s3"
+  default = null
+}
+
 variable "vpc_config" {
   type = object({
     subnet_ids = list(string)
