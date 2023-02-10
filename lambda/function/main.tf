@@ -105,6 +105,13 @@ resource "aws_iam_policy" "vpc_access" {
   policy = data.aws_iam_policy_document.vpc_access.json
 }
 
+resource "aws_iam_policy" "extra" {
+  count = length(var.policy_documents)
+  name = "${var.name}-extra-policies-${count.index}"
+  description = "Extra policy for function ${var.name}"
+  policy = var.policy_documents[count.index]
+}
+
 resource "aws_iam_role_policy_attachment" "vpc_access" {
   count = var.vpc_config == null ? 0 : 1
   role = aws_iam_role.execution.name
@@ -112,7 +119,7 @@ resource "aws_iam_role_policy_attachment" "vpc_access" {
 }
 
 resource "aws_iam_role_policy_attachment" "extra_policies" {
-  for_each = toset(var.policy_arns)
+  for_each = toset(concat([var.policy_arns], [for p in aws_iam_policy.extra: p.arn]))
   role = aws_iam_role.execution.name
   policy_arn = each.value
 }
