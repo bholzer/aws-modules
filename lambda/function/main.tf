@@ -119,7 +119,7 @@ resource "aws_iam_role_policy_attachment" "vpc_access" {
 }
 
 resource "aws_iam_role_policy_attachment" "extra_policies" {
-  for_each = toset(concat([var.policy_arns], [for p in aws_iam_policy.extra: p.arn]))
+  for_each = toset(concat(var.policy_arns, [for p in aws_iam_policy.extra: p.arn]))
   role = aws_iam_role.execution.name
   policy_arn = each.value
 }
