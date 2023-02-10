@@ -60,6 +60,12 @@ variable "s3_source" {
   default = null
 }
 
+variable "policy_documents" {
+  type = list(string)
+  description = "List of policy documents to attach to the function execution role"
+  default = []
+}
+
 variable "vpc_config" {
   type = object({
     subnet_ids = list(string)
